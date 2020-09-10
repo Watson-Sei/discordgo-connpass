@@ -23,7 +23,7 @@ func main() {
 	}
 
 	Token := os.Getenv("DGU_TOKEN")
-	fmt.Println(Token)
+	log.Println("Token: ",Token)
 	if Token == "" {
 		return
 	}
@@ -35,11 +35,14 @@ func main() {
 		return
 	}
 
+	// Register ready as a callback for the ready events.
+	dg.AddHandler(ready)
+
 	// Register the messageCreate func as a callback for MessageCreate events.
 	dg.AddHandler(messageCreate)
 
 	// In this example, we only care about receiving message events.
-	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuilds | discordgo.IntentsGuildMessages)
 
 	// Open a websocket connection to Discord and begin listening.
 	err = dg.Open()
@@ -58,9 +61,19 @@ func main() {
 	dg.Close()
 }
 
+
+// This function will be called (due to AddHandler above) when the bot receives
+// the "ready" event from Discord.
+func ready(s *discordgo.Session, event *discordgo.Ready)  {
+	// Set the playing status.
+	log.Println("BotName: ",event.User.ID)
+	log.Println("BotID: ",event.User.Username)
+	s.UpdateStatus(0, "connpass api!")
+}
+
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the authenticated bot has access to.
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate, g *discordgo.Guild) {
+func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Ignore all messages created by the bot itself
 	// This isn't required in this specific example but it's a good practice.
@@ -87,13 +100,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate, g *discordg
 	}
 
 	if m.Content == "ServerName" {
-		fmt.Println("実行されました。")
-		fmt.Println(g.Name)
-		s.ChannelMessageSend(m.ChannelID, "")
+		g, err := s.Guild(m.GuildID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(g.Name)
+		s.ChannelMessageSend(m.ChannelID, g.Name)
 	}
 }
-
-
 
 
 
