@@ -6,13 +6,13 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
+	"example.com/go-mod-test/split"
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
 )
-
-// Variables used for command line parameters
 
 func main() {
 
@@ -60,18 +60,40 @@ func main() {
 
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the authenticated bot has access to.
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate, g *discordgo.Guild) {
 
 	// Ignore all messages created by the bot itself
 	// This isn't required in this specific example but it's a good practice.
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	// If the message is "ping" reply with "Pong!"
-	switch m.Content {
-	case "おはよう":
-		s.ChannelMessageSend(m.ChannelID, "おはようございます。")
-	default:
-		s.ChannelMessageSend(m.ChannelID, "理解できませんでした。")
+
+
+	// 1. データが欲しい言語のリスト（JSONにする予定)
+	// 1. データを一覧表示
+	if m.Content == "--notification-list" {
+
+	}
+
+	// 1. データ追加
+	if strings.HasPrefix(m.Content, "--add="){
+		keyword := split.SplitMultiSep(strings.Split(m.Content, "=")[1], []string{"&",","," "})
+		add_keyword := ""
+		for k := range keyword {
+			add_keyword += keyword[k] + "\n"
+		}
+		add_keyword += "以上のキーワードが追加されました。\n"
+		s.ChannelMessageSend(m.ChannelID, add_keyword)
+	}
+
+	if m.Content == "ServerName" {
+		fmt.Println("実行されました。")
+		fmt.Println(g.Name)
+		s.ChannelMessageSend(m.ChannelID, "")
 	}
 }
+
+
+
+
+
