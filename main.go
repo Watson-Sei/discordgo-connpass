@@ -19,7 +19,11 @@ func main() {
 	err := godotenv.Load(fmt.Sprintf("./%s.env", os.Getenv("GO_ENV")))
 	if err != nil {
 		// .env読めなかった場合の処理
-		log.Fatal(err)
+		log.Println(err)
+		log.Println("this is product")
+	} else {
+		log.Println(err)
+		log.Println("this is develop")
 	}
 
 	Token := os.Getenv("DGU_TOKEN")
