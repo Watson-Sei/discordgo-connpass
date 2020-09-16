@@ -1,4 +1,4 @@
-module example.com/go-mod-test
+module github.com/Watson-Sei/discordgo-connpass
 
 go 1.14
 
