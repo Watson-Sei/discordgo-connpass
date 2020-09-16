@@ -9,7 +9,7 @@ import (
 	"strings"
 	"syscall"
 
-	"example.com/go-mod-test/split"
+	"github.com/Watson-Sei/discordgo-connpass/split"
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
 )
